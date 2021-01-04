@@ -1,0 +1,1 @@
+Start test by running command: npm run test
