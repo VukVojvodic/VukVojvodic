@@ -1,0 +1,348 @@
+{
+	"info": {
+		"_postman_id": "125eb860-8d33-4198-9473-4cc7670eb741",
+		"name": "API 101",
+		"description": "API 101 template for learning API request basics. Follow along with the webinar / video or just open the first request and hit **Send**!",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get all customers",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "user-id",
+						"value": "{{userId}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://api-101.glitch.me/customers",
+					"protocol": "https",
+					"host": [
+						"api-101",
+						"glitch",
+						"me"
+					],
+					"path": [
+						"customers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get one customer",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "user-id",
+						"value": "{{userId}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{apiUrl}}/customer?id=2",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"customer"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add new customer",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "Vucko",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "auth_key",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "user-id",
+						"value": "{{userId}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Dorothy Zbornak\",\r\n    \"type\": \"Individual\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiUrl}}/customer",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"customer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "Vucko",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "auth_key",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "user-id",
+						"value": "{{userId}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Sophia Petrillo\",\r\n    \"type\": \"Individual\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiUrl}}/customer/:customer_id",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"customer",
+						":customer_id"
+					],
+					"variable": [
+						{
+							"key": "customer_id",
+							"value": "447",
+							"type": "string"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remove customer",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "Vucko",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "auth_key",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "user-id",
+						"value": "{{userId}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{apiUrl}}/customer/:customer_id",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"customer",
+						":customer_id"
+					],
+					"variable": [
+						{
+							"key": "customer_id",
+							"value": "447",
+							"type": "string"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"var uID = pm.collectionVariables.get(\"userId\");",
+					"if(!uID)",
+					"    pm.collectionVariables.set(\"userId\", pm.variables.replaceIn('{{$guid}}'));"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"var template = `",
+					"    <!--showdown for converting md to html-->",
+					"    <script src=\"https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js\"></script>",
+					"    <script type=\"text/javascript\">",
+					"        function getContent(orig){",
+					"            var converter = new showdown.Converter(), text = orig, html = converter.makeHtml(text);",
+					"            return html;",
+					"        }",
+					"    </script>",
+					"    ",
+					"    <!--syntax highlighting-->",
+					"    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.0/styles/default.min.css\">",
+					"    <script src=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.0/highlight.min.js\"></script>",
+					"    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.0/styles/googlecode.min.css\">",
+					"    ",
+					"    <!--generic styles-->",
+					"    <style type=\"text/css\">",
+					"    #notes p, #next p {padding-left:20px; border-left:2px solid #333333; }",
+					"    #notes, #next {padding-right:20px;}",
+					"    img {max-width:600px; padding-left:20px; padding-bottom:20px;}",
+					"    </style>",
+					"",
+					"    <h2>{{response.tutorial.title}}</h2>",
+					"    ",
+					"    <div id=\"intro\"></div>",
+					"",
+					"    <div id=\"notes\"></div>",
+					"    ",
+					"    {{#if response.tutorial.next}}",
+					"    <h3>Next</h3>",
+					"    <div id=\"next\"></div>",
+					"    {{/if}}",
+					"    ",
+					"    <script type=\"text/javascript\">",
+					"        if(\"{{response.tutorial.rip}}\".length>0)",
+					"            document.write(getContent(\"{{response.tutorial.rip}}\"));",
+					"    </script>",
+					"    ",
+					"    <script type=\"text/javascript\">",
+					"        if(\"{{response.tutorial.pic}}\".length>0)",
+					"            document.write(\"<img src='{{response.tutorial.pic}}' alt='postman steps'/>\");",
+					"    </script>",
+					"",
+					"    <!--content to process before rendering-->",
+					"    <script type=\"text/javascript\">",
+					"        pm.getData(function(error, data) {",
+					"            let json_strings = []; let i; let info_array = data.response.tutorial.steps;",
+					"            var notes=\"<div id='notes'>\";",
+					"            for(i=0; i<info_array.length; i++){",
+					"                notes+=getContent(info_array[i].note);",
+					"                if(info_array[i].raw_data){",
+					"                    notes+=\"<pre style='padding-left:20px'><code class='json'>\"+JSON.stringify(info_array[i].raw_data, null, 2)+\"</code></pre>\";",
+					"                }",
+					"                if(info_array[i].pic)",
+					"                    notes+=\"<img src='\"+info_array[i].pic+\"' alt='postman steps'/>\";",
+					"            }",
+					"            notes+=\"</div>\"",
+					"            document.getElementById(\"intro\").innerHTML=getContent(data.response.tutorial.intro);",
+					"            document.getElementById(\"notes\").innerHTML=notes;",
+					"            var nextDiv=document.getElementById(\"next\");",
+					"            var n;",
+					"            var nextContent=\"\";",
+					"            let nextArray=data.response.tutorial.next;",
+					"            for(n=0; n<nextArray.length; n++){",
+					"                nextContent+=\"<p>\"+getContent(nextArray[n].step)+\"</p>\";",
+					"             if(nextArray[n].raw_data){",
+					"                 nextContent+=\"<pre style='padding-left:20px'><code class='json'>\"+JSON.    stringify(nextArray[n].raw_data, null, 2)+\"</code></pre>\";",
+					"                }",
+					"            }",
+					"            nextDiv.innerHTML=getContent(nextContent);",
+					"            hljs.initHighlighting();",
+					"        });",
+					"    </script>",
+					"`;",
+					"if (pm.response.headers.get(\"Content-Type\").includes(\"json\")) {",
+					"    pm.visualizer.set(template, {",
+					"        response: pm.response.json()",
+					"    });",
+					"}",
+					"else if (pm.response.headers.get(\"Content-Type\").includes(\"html\")) {",
+					"    pm.visualizer.set(`{{info}}`, { info: \"Hmm this seems to be HTML and not JSON - you might have hit an invalid endpoint - undo your changes, or close the request without saving and try opening / sending it again!\" });",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "apiUrl",
+			"value": "api-101.glitch.me"
+		},
+		{
+			"key": "userId",
+			"value": ""
+		}
+	]
+}
