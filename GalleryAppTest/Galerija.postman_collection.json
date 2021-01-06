@@ -1,0 +1,1598 @@
+{
+	"info": {
+		"_postman_id": "0ab180d4-a90f-4d4d-9255-4cf2d3481d1c",
+		"name": "Galerija",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var email = \"vuk\" + _.random(1, 1000) + \"@gmail.com\";",
+							"pm.environment.set(\"email\", email);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\":\"{{first_name}}\",\n    \"last_name\":\"{{last_name}}\",\n    \"email\":\"{{email}}\",\n    \"password\":\"{{password}}\",\n    \"password_confirmation\":\"{{password_confirmation}}\",\n    \"terms_and_conditions\":{{terms_and_conditions}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Auth url}}/register",
+					"host": [
+						"{{Auth url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"var tokenRes = jsonData.access_token;",
+							"pm.environment.set(\"token\", tokenRes);",
+							"pm.test('Has token', function() {",
+							"  pm.expect(jsonData).to.have.property('access_token');",
+							"});",
+							"pm.test('Has token type', function() {",
+							"  pm.expect(jsonData).to.have.property('token_type');",
+							"});",
+							"pm.test('Has User ID', function() {",
+							"  pm.expect(jsonData).to.have.property('user_id');",
+							"});",
+							"pm.test('User ID is '+ jsonData.user_id, function() {",
+							"  pm.expect(jsonData).to.have.property('user_id');",
+							"});",
+							"pm.test('Token is bearer', function() {",
+							"  pm.expect(jsonData.token_type).is.equal(\"bearer\");",
+							"});",
+							"pm.test('Token expires in 3600', function() {",
+							"  pm.expect(jsonData.expires_in).is.equal(3600);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\":\"{{email}}\",\n    \"password\":\"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Auth url}}/login",
+					"host": [
+						"{{Auth url}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create gallery",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"var galidRes = jsonData.id;",
+							"pm.environment.set(\"Galeryid\", galidRes);",
+							"var titleEnv = pm.environment.get(\"title\")",
+							"var titleRes = jsonData.title;",
+							"tests[\"Title\" + titleRes] = titleEnv === titleRes;",
+							"tests[\"Description:\" + jsonData.description] = jsonData.description === pm.environment.get(\"description\");",
+							"    "
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"title\":\"{{title}}\",\n\"description\":\"{{description}}\",\n\"images\":[{{images}}]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Galeries url}}",
+					"host": [
+						"{{Galeries url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all galleries",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response time is less than 300ms, it is \" + pm.response.responseTime + \"ms!!!\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);",
+							"});",
+							"pm.test(\"The active environment is Galerija\", () => {",
+							"  pm.expect(pm.environment.name).to.eql(\"Galerija\");",
+							"});",
+							"const jsonData = pm.response.json();",
+							"pm.test('Has galleries', function() {",
+							"  pm.expect(jsonData).to.have.property('galleries');",
+							"});",
+							"pm.test('All Galleries contains kacina galerija230', () => {",
+							"    pm.expect(jsonData.galleries[0]).to.haveOwnPropertyDescriptor",
+							"        (",
+							"            \"id\", 183 && \"title\", \"kacina galerija230\"&& \"description\", \"kacina galerija 36\"&& \"user_id\", 107&& \"created_at\", \"2020-12-04 08:34:39\"&& \"updated_at\", \"2020-12-04 08:34:39\"&& \"user\", ",
+							"            {",
+							"                \"id\": 107,",
+							"                \"first_name\": \"Katarina\",",
+							"                \"last_name\": \"Sirocic\",",
+							"                \"email\": \"katarinas940@gmail.com\",",
+							"                \"terms_and_conditions\": 1,",
+							"                \"created_at\": \"2020-12-03 13:36:36\",",
+							"                \"updated_at\": \"2020-12-03 13:36:36\"",
+							"            }&& \"images\", ",
+							"            [",
+							"                {",
+							"                    \"id\": 269,",
+							"                    \"image_url\": \"https://tinyjpg.com/images/social/website.jpg\",",
+							"                    \"gallery_id\": 183,",
+							"                    \"created_at\": \"2020-12-04 08:34:39\",",
+							"                    \"updated_at\": \"2020-12-04 08:34:39\"",
+							"                }",
+							"            ]",
+							"        )  ",
+							"    });",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{Galeries url}}?page=1&term=",
+					"host": [
+						"{{Galeries url}}"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "term",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get my galleries",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.test('Has galleries', function() {\r",
+							"  pm.expect(jsonData).to.have.property('galleries');\r",
+							"});\r",
+							"pm.test('Has count', function() {\r",
+							"  pm.expect(jsonData).to.have.property('count');\r",
+							"});\r",
+							"pm.test('Count is '+ jsonData.count, function() {\r",
+							"  pm.expect(jsonData).to.have.property('count');\r",
+							"});\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Mygalleries url}}",
+					"host": [
+						"{{Mygalleries url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Open my gallery",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Galeries url}}/{{Galeryid}}",
+					"host": [
+						"{{Galeries url}}"
+					],
+					"path": [
+						"{{Galeryid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete gallery",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.unset(\"Galeryid\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{Galeries url}}/{{Galeryid}}",
+					"host": [
+						"{{Galeries url}}"
+					],
+					"path": [
+						"{{Galeryid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Open my deleted gallery",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{Galeries url}}/{{Galeryid}}",
+					"host": [
+						"{{Galeries url}}"
+					],
+					"path": [
+						"{{Galeryid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"jsonData = pm.response.json();\r",
+							"pm.test('Has message', function() {\r",
+							"  pm.expect(jsonData).to.have.property('message');\r",
+							"});\r",
+							"pm.test(\"Successfully logged out message\", () => {\r",
+							"    pm.expect(jsonData.message).to.equal(\"Successfully logged out\")\r",
+							"});\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Response time is less than 300ms, it is \" + pm.response.responseTime + \"ms!!!\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{Auth url}}/logout",
+					"host": [
+						"{{Auth url}}"
+					],
+					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register no data",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.visualizer.set(template, {\r",
+							"    // Pass the response body parsed as JSON as `data`\r",
+							"    response: pm.response.json()\r",
+							"});\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.test('Has property message', function () {\r",
+							"    pm.expect(jsonData).to.have.property('message');\r",
+							"});\r",
+							"pm.test('Has property errors', function () {\r",
+							"    pm.expect(jsonData).to.have.property('errors');\r",
+							"});\r",
+							"pm.test('Register contains all errors', () => \r",
+							"{\r",
+							"    pm.expect(jsonData.errors).to.haveOwnPropertyDescriptor\r",
+							"        ( \r",
+							"            \"first_name\", \"The first name field is required.\" &&\r",
+							"            \"last_name\", \"The last name field is required.\" &&\r",
+							"            \"email\", \"The email field is required.\" &&\r",
+							"            \"password\", \"The password field is required.\"&&\r",
+							"            \"terms_and_conditions\", \"The terms and conditions field is required.\"\r",
+							"        )\r",
+							"});\r",
+							"pm.test(\"Status code is 422\", function () {\r",
+							"    pm.response.to.have.status(422);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\":\"\",\n    \"last_name\":\"\",\n    \"email\":\"\",\n    \"password\":\"\",\n    \"password_confirmation\":\"\",\n    \"terms_and_conditions\":\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Auth url}}/register",
+					"host": [
+						"{{Auth url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register raw visualisation no data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var template = `",
+							"    <div>",
+							"    <h1 class=\"title-style\">Register</h1>",
+							"    <form @submit.prevent=\"register\">",
+							"      <div class=\"form-group\">",
+							"        <label for=\"first-name\">First Name</label>",
+							"        <input type=\"text\" class=\"form-control\" id=\"first-name\" v-model=\"newUser.first_name\" required>",
+							"        <p class=\"alert alert-danger\" v-if=\"errors.first_name\">'No first name'</p>",
+							"      </div>",
+							"      <div class=\"form-group\">",
+							"        <label for=\"last-name\">Last Name</label>",
+							"        <input type=\"text\" class=\"form-control\" id=\"last-name\" v-model=\"newUser.last_name\" required>",
+							"        <p class=\"alert alert-danger\" v-if=\"errors.last_name\">'No last name'</p>",
+							"      </div>",
+							"      <div class=\"form-group\">",
+							"        <label for=\"email\">Email</label>",
+							"        <input type=\"email\" class=\"form-control\" id=\"email\" v-model=\"newUser.email\" required>",
+							"        <p class=\"alert alert-danger\" v-if=\"errors.email\">'No email'</p>",
+							"      </div>",
+							"      <div class=\"form-group\">",
+							"        <label for=\"password\">Password</label>",
+							"        <input type=\"password\" class=\"form-control\" id=\"password\" v-model=\"newUser.password\" required>",
+							"        <p class=\"alert alert-danger\" v-if=\"errors.password\">'No password'</p>",
+							"      </div>",
+							"      <div class=\"form-group\">",
+							"        <label for=\"password-confirmation\">Confirmed Password</label>",
+							"        <input type=\"password\" class=\"form-control\" id=\"password-confirmation\" v-model=\"newUser.password_confirmation\" required>",
+							"      </div>",
+							"      <div class=\"form-group\">",
+							"        <input type=\"checkbox\" class=\"form-check-input\" v-model=\"newUser.terms_and_conditions\">",
+							"        <label class=\"form-check-label\" for=\"exampleCheck1\">Accepted terms and conditions</label>",
+							"        <p class=\"alert alert-danger\" v-if=\"errors.terms_and_conditions\">'No terms'</p>",
+							"      </div>",
+							"      <button type=\"submit\" class=\"btn btn-custom\">Submit</button>",
+							"    </form>",
+							"  </div>",
+							"`;",
+							"pm.visualizer.set(template, {",
+							"    response: pm.response.json()",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"contacts\": [\n\t\t{\n\t\t\t\"name\": \"{{$randomFullName}}\",\n\t\t\t\"email\": \"{{$randomEmail}}\"\n\t\t},\n\t\t{\n\t\t\t\"name\": \"{{$randomFullName}}\",\n\t\t\t\"email\": \"{{$randomEmail}}\"\n\t\t},\n\t\t{\n\t\t\t\"name\": \"{{$randomFullName}}\",\n\t\t\t\"email\": \"{{$randomEmail}}\"\n\t\t},\n\t\t{\n\t\t\t\"name\": \"{{$randomFullName}}\",\n\t\t\t\"email\": \"{{$randomEmail}}\"\n\t\t}\n\t\t]\n}\n\t\t"
+				},
+				"url": {
+					"raw": "https://postman-echo.com/post",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"post"
+					]
+				},
+				"description": "Gets randomly generated names and e-mails from postman-echo and visualizes the response body as a table."
+			},
+			"response": []
+		},
+		{
+			"name": "Register no FN",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var email = \"vuk\" + _.random(1, 1000000) + \"@gmail.com\"\r",
+							"pm.environment.set(\"email\", email);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.test('Has property message', function () {\r",
+							"    pm.expect(jsonData).to.have.property('message');\r",
+							"});\r",
+							"pm.test('Has property errors', function () {\r",
+							"    pm.expect(jsonData).to.have.property('errors');\r",
+							"});\r",
+							"pm.test('Register contains FN error', () => \r",
+							"{\r",
+							"    pm.expect(jsonData.errors).to.haveOwnPropertyDescriptor\r",
+							"        ( \r",
+							"            \"first_name\", \"The first name field is required.\"\r",
+							"        )\r",
+							"});\r",
+							"pm.test(\"Status code is 422\", function () {\r",
+							"    pm.response.to.have.status(422);\r",
+							"});\r",
+							"pm.test(\"Response time is less than 300ms it is \"+ pm.response.responseTime, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\":\"\",\n    \"last_name\":\"{{last_name}}\",\n    \"email\":\"{{email}}\",\n    \"password\":\"{{password}}\",\n    \"password_confirmation\":\"{{password_confirmation}}\",\n    \"terms_and_conditions\":{{terms_and_conditions}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Auth url}}/register",
+					"host": [
+						"{{Auth url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register no LN",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.test('Has property message', function () {\r",
+							"    pm.expect(jsonData).to.have.property('message');\r",
+							"});\r",
+							"pm.test('Has property errors', function () {\r",
+							"    pm.expect(jsonData).to.have.property('errors');\r",
+							"});\r",
+							"pm.test('Register contains LN error', () => \r",
+							"{\r",
+							"    pm.expect(jsonData.errors).to.haveOwnPropertyDescriptor\r",
+							"        ( \r",
+							"            \"last_name\", \"The last name field is required.\"\r",
+							"        )\r",
+							"});\r",
+							"pm.test(\"Status code is 422\", function () {\r",
+							"    pm.response.to.have.status(422);\r",
+							"});\r",
+							"pm.test(\"Response time is less than 300ms it is \"+ pm.response.responseTime, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\":\"{{first_name}}\",\n    \"last_name\":\"\",\n    \"email\":\"{{email}}\",\n    \"password\":\"{{password}}\",\n    \"password_confirmation\":\"{{password_confirmation}}\",\n    \"terms_and_conditions\":{{terms_and_conditions}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Auth url}}/register",
+					"host": [
+						"{{Auth url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register no Email",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.test('Has property message', function () {\r",
+							"    pm.expect(jsonData).to.have.property('message');\r",
+							"});\r",
+							"pm.test('Has property errors', function () {\r",
+							"    pm.expect(jsonData).to.have.property('errors');\r",
+							"});\r",
+							"pm.test('Register contains EM error', () => \r",
+							"{\r",
+							"    pm.expect(jsonData.errors).to.haveOwnPropertyDescriptor\r",
+							"        ( \r",
+							"            \"email\", \"The email field is required.\"\r",
+							"        )\r",
+							"});\r",
+							"pm.test(\"Status code is 422\", function () {\r",
+							"    pm.response.to.have.status(422);\r",
+							"});\r",
+							"pm.test(\"Response time is less than 300ms it is \"+ pm.response.responseTime, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\":\"{{first_name}}\",\n    \"last_name\":\"{{last_name}}\",\n    \"email\":\"\",\n    \"password\":\"{{password}}\",\n    \"password_confirmation\":\"{{password_confirmation}}\",\n    \"terms_and_conditions\":{{terms_and_conditions}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Auth url}}/register",
+					"host": [
+						"{{Auth url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register Email taken",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var email = \"vuk.vojvodic021@gmail.com\";",
+							"pm.environment.set(\"email\", email);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.test('Has property message', function () {\r",
+							"    pm.expect(jsonData).to.have.property('message');\r",
+							"});\r",
+							"pm.test('Has property errors', function () {\r",
+							"    pm.expect(jsonData).to.have.property('errors');\r",
+							"});\r",
+							"pm.test('Register contains EM error', () => \r",
+							"{\r",
+							"    pm.expect(jsonData.errors).to.haveOwnPropertyDescriptor\r",
+							"        ( \r",
+							"            \"email\", \"The email has already been taken.\"\r",
+							"        )\r",
+							"});\r",
+							"pm.test(\"Status code is 422\", function () {\r",
+							"    pm.response.to.have.status(422);\r",
+							"});\r",
+							"pm.test(\"Response time is less than 300ms it is \"+ pm.response.responseTime, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\":\"{{first_name}}\",\n    \"last_name\":\"{{last_name}}\",\n    \"email\":\"{{email}}\",\n    \"password\":\"{{password}}\",\n    \"password_confirmation\":\"{{password_confirmation}}\",\n    \"terms_and_conditions\":{{terms_and_conditions}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Auth url}}/register",
+					"host": [
+						"{{Auth url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register no Password",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var email = \"vuk\" + _.random(1, 1000000) + \"@gmail.com\"",
+							"pm.environment.set(\"email\", email);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.test('Has property message', function () {\r",
+							"    pm.expect(jsonData).to.have.property('message');\r",
+							"});\r",
+							"pm.test('Has property errors', function () {\r",
+							"    pm.expect(jsonData).to.have.property('errors');\r",
+							"});\r",
+							"pm.test('Register contains password error', () => \r",
+							"{\r",
+							"    pm.expect(jsonData.errors).to.haveOwnPropertyDescriptor\r",
+							"        ( \r",
+							"            \"password\", \"The password field is required.\"\r",
+							"        )\r",
+							"});\r",
+							"pm.test(\"Status code is 422\", function () {\r",
+							"    pm.response.to.have.status(422);\r",
+							"});\r",
+							"pm.test(\"Response time is less than 300ms it is \"+ pm.response.responseTime, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\":\"{{first_name}}\",\n    \"last_name\":\"{{last_name}}\",\n    \"email\":\"{{email}}\",\n    \"password\":\"\",\n    \"password_confirmation\":\"{{password_confirmation}}\",\n    \"terms_and_conditions\":{{terms_and_conditions}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Auth url}}/register",
+					"host": [
+						"{{Auth url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register no Terms",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.test('Has property message', function () {\r",
+							"    pm.expect(jsonData).to.have.property('message');\r",
+							"});\r",
+							"pm.test('Has property errors', function () {\r",
+							"    pm.expect(jsonData).to.have.property('errors');\r",
+							"});\r",
+							"pm.test('Register contains terms error', () => \r",
+							"{\r",
+							"    pm.expect(jsonData.errors).to.haveOwnPropertyDescriptor\r",
+							"        ( \r",
+							"            \"terms_and_conditions\", \"The terms and conditions must be accepted.\"\r",
+							"        )\r",
+							"});\r",
+							"pm.test(\"Status code is 422\", function () {\r",
+							"    pm.response.to.have.status(422);\r",
+							"});\r",
+							"pm.test(\"Response time is less than 300ms it is \"+ pm.response.responseTime, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\":\"{{first_name}}\",\n    \"last_name\":\"{{last_name}}\",\n    \"email\":\"{{email}}\",\n    \"password\":\"{{password}}\",\n    \"password_confirmation\":\"{{password_confirmation}}\",\n    \"terms_and_conditions\": false\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Auth url}}/register",
+					"host": [
+						"{{Auth url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login no data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test('Has property error', function () {",
+							"    pm.expect(jsonData).to.have.property('error');",
+							"});",
+							"pm.test('Register contains Unauthorized error', () => ",
+							"{",
+							"    pm.expect(jsonData).to.haveOwnPropertyDescriptor",
+							"        ( ",
+							"            \"error\", \"Unauthorized\"",
+							"        )",
+							"});",
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"pm.test(\"Response time is less than 300ms it is \"+ pm.response.responseTime, function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\":\"\",\n    \"password\":\"\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Auth url}}/login",
+					"host": [
+						"{{Auth url}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login no Email",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test('Has property error', function () {",
+							"    pm.expect(jsonData).to.have.property('error');",
+							"});",
+							"pm.test('Register contains Unauthorized error', () => ",
+							"{",
+							"    pm.expect(jsonData).to.haveOwnPropertyDescriptor",
+							"        ( ",
+							"            \"error\", \"Unauthorized\"",
+							"        )",
+							"});",
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"pm.test(\"Response time is less than 300ms it is \"+ pm.response.responseTime, function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\":\"\",\n    \"password\":\"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Auth url}}/login",
+					"host": [
+						"{{Auth url}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login no Password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test('Has property error', function () {",
+							"    pm.expect(jsonData).to.have.property('error');",
+							"});",
+							"pm.test('Register contains Unauthorized error', () => ",
+							"{",
+							"    pm.expect(jsonData).to.haveOwnPropertyDescriptor",
+							"        ( ",
+							"            \"error\", \"Unauthorized\"",
+							"        )",
+							"});",
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"pm.test(\"Response time is less than 300ms it is \"+ pm.response.responseTime, function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\":\"{{email}}\",\n    \"password\":\"\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Auth url}}/login",
+					"host": [
+						"{{Auth url}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login Vuk",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"var tokenRes = jsonData.access_token;",
+							"pm.environment.set(\"token\", tokenRes);",
+							"pm.test('Has token', function() {",
+							"  pm.expect(jsonData).to.have.property('access_token');",
+							"});",
+							"pm.test('Has token type', function() {",
+							"  pm.expect(jsonData).to.have.property('token_type');",
+							"});",
+							"pm.test('Has User ID', function() {",
+							"  pm.expect(jsonData).to.have.property('user_id');",
+							"});",
+							"pm.test('Token is bearer', function() {",
+							"  pm.expect(jsonData.token_type).is.equal(\"bearer\");",
+							"});",
+							"pm.test('Token expires in 3600', function() {",
+							"  pm.expect(jsonData.expires_in).is.equal(3600);",
+							"});",
+							"pm.test('User ID is '+ jsonData.user_id, function() {",
+							"  pm.expect(jsonData.user_id).is.equal(3);",
+							"});",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var email = \"vuk.vojvodic021@gmail.com\";\r",
+							"pm.environment.set(\"email\", email);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\":\"{{email}}\",\n    \"password\":\"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Auth url}}/login",
+					"host": [
+						"{{Auth url}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get my galleries Vuk",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.test('Has atleasat least 1 gallerie', function() {\r",
+							"  pm.expect(jsonData).to.have.property('galleries');\r",
+							"});\r",
+							"pm.test('My Galleries contains gallery '+ jsonData.galleries[0].title, () => {\r",
+							"    pm.expect(jsonData.galleries[0]).to.haveOwnPropertyDescriptor\r",
+							"        (\r",
+							"            \"id\", 6 && \"title\", \"12\" && \"description\", \"12\" && \"user_id\", 3 && \"created_at\",\"2020-11-10 15:06:49\" && \"updated_at\",\"2020-11-10 15:06:49\" && \"user\",\r",
+							"    {\r",
+							"        \"id\":3,\r",
+							"        \"first_name\":\"Vuk\",\r",
+							"        \"last_name\":\"Vojvodic\",\r",
+							"        \"email\":\"vuk.vojvodic021@gmail.com\",\r",
+							"        \"terms_and_conditions\":1,\r",
+							"        \"created_at\":\"2020-11-10 14:43:41\",\r",
+							"        \"updated_at\":\"2020-11-10 14:43:41\"\r",
+							"    } && \"images\",\r",
+							"    [\r",
+							"        {\r",
+							"            \"id\":23,\r",
+							"            \"image_url\":\"https:\\/\\/upload.wikimedia.org\\/wikipedia\\/commons\\/3\\/3e\\/Phalaenopsis_JPEG.png\",\r",
+							"            \"gallery_id\":6,\r",
+							"            \"created_at\":\"2020-11-10 15:07:43\",\r",
+							"            \"updated_at\":\"2020-11-10 15:07:43\"\r",
+							"        },\r",
+							"        {\"id\":24,\r",
+							"        \"image_url\":\"https:\\/\\/upload.wikimedia.org\\/wikipedia\\/commons\\/8\\/8e\\/Eyjafjallaj%C3%B6kull.jpeg\",\r",
+							"        \"gallery_id\":6,\r",
+							"        \"created_at\":\"2020-11-10 15:07:43\",\"updated_at\":\"2020-11-10 15:07:43\"\r",
+							"        }\r",
+							"    ] && \"comments\",\r",
+							"    [\r",
+							"        {\"id\":55,\r",
+							"        \"body\":\"Pozzz\",\r",
+							"        \"user_id\":35,\r",
+							"        \"gallery_id\":6,\r",
+							"        \"created_at\":\"2020-11-19 12:21:34\",\r",
+							"        \"updated_at\":\"2020-11-19 12:21:34\",\r",
+							"        \"user\":\r",
+							"            {\"id\":35,\r",
+							"            \"first_name\":\"vuk\",\r",
+							"            \"last_name\":\"vuk\",\r",
+							"            \"email\":\"vuk@vuk.com\",\r",
+							"            \"terms_and_conditions\":1,\r",
+							"            \"created_at\":\"2020-11-19 12:14:26\",\r",
+							"            \"updated_at\":\"2020-11-19 12:14:26\"\r",
+							"            }\r",
+							"        }\r",
+							"    ]\r",
+							"    )});\r",
+							"pm.test('Has count property', function() {\r",
+							"  pm.expect(jsonData).to.have.property('count');\r",
+							"});\r",
+							"pm.test('Count is '+ jsonData.count, function() {\r",
+							"  pm.expect(jsonData).to.have.property('count');\r",
+							"});\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{MyGalleries url}}?page=1&term=",
+					"host": [
+						"{{MyGalleries url}}"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "term",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Open my gallery Vuk",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.test('My Galleries is gallery '+ jsonData.title, () => {\r",
+							"    pm.expect(jsonData).to.haveOwnPropertyDescriptor\r",
+							"        (\r",
+							"            \"id\", 6 && \"title\", \"12\" && \"description\", \"12\" && \"user_id\", 3 && \"created_at\",\"2020-11-10 15:06:49\" && \"updated_at\",\"2020-11-10 15:06:49\" && \"user\",\r",
+							"    {\r",
+							"        \"id\":3,\r",
+							"        \"first_name\":\"Vuk\",\r",
+							"        \"last_name\":\"Vojvodic\",\r",
+							"        \"email\":\"vuk.vojvodic021@gmail.com\",\r",
+							"        \"terms_and_conditions\":1,\r",
+							"        \"created_at\":\"2020-11-10 14:43:41\",\r",
+							"        \"updated_at\":\"2020-11-10 14:43:41\"\r",
+							"    } && \"images\",\r",
+							"    [\r",
+							"        {\r",
+							"            \"id\":23,\r",
+							"            \"image_url\":\"https:\\/\\/upload.wikimedia.org\\/wikipedia\\/commons\\/3\\/3e\\/Phalaenopsis_JPEG.png\",\r",
+							"            \"gallery_id\":6,\r",
+							"            \"created_at\":\"2020-11-10 15:07:43\",\r",
+							"            \"updated_at\":\"2020-11-10 15:07:43\"\r",
+							"        },\r",
+							"        {\"id\":24,\r",
+							"        \"image_url\":\"https:\\/\\/upload.wikimedia.org\\/wikipedia\\/commons\\/8\\/8e\\/Eyjafjallaj%C3%B6kull.jpeg\",\r",
+							"        \"gallery_id\":6,\r",
+							"        \"created_at\":\"2020-11-10 15:07:43\",\"updated_at\":\"2020-11-10 15:07:43\"\r",
+							"        }\r",
+							"    ] && \"comments\",\r",
+							"    [\r",
+							"        {\"id\":55,\r",
+							"        \"body\":\"Pozzz\",\r",
+							"        \"user_id\":35,\r",
+							"        \"gallery_id\":6,\r",
+							"        \"created_at\":\"2020-11-19 12:21:34\",\r",
+							"        \"updated_at\":\"2020-11-19 12:21:34\",\r",
+							"        \"user\":\r",
+							"            {\"id\":35,\r",
+							"            \"first_name\":\"vuk\",\r",
+							"            \"last_name\":\"vuk\",\r",
+							"            \"email\":\"vuk@vuk.com\",\r",
+							"            \"terms_and_conditions\":1,\r",
+							"            \"created_at\":\"2020-11-19 12:14:26\",\r",
+							"            \"updated_at\":\"2020-11-19 12:14:26\"\r",
+							"            }\r",
+							"        }\r",
+							"    ]\r",
+							"    )});\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Galeries url}}/6",
+					"host": [
+						"{{Galeries url}}"
+					],
+					"path": [
+						"6"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout no login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"jsonData = pm.response.json();\r",
+							"pm.test('Has message', function() {\r",
+							"  pm.expect(jsonData).to.have.property('message');\r",
+							"});\r",
+							"pm.test('Has exception', function() {\r",
+							"  pm.expect(jsonData).to.have.property('exception');\r",
+							"});\r",
+							"pm.test('Has some file', function() {\r",
+							"  pm.expect(jsonData).to.have.property('file');\r",
+							"});\r",
+							"pm.test(\"Unsuccessfull loggout message\", () => {\r",
+							"    pm.expect(jsonData.message).to.equal(\"Route [login] not defined.\")\r",
+							"});\r",
+							"pm.test(\"Exception message\", () => {\r",
+							"    pm.expect(jsonData.exception).to.equal(\"InvalidArgumentException\")\r",
+							"});\r",
+							"pm.test(\"Status code is 500\", function () {\r",
+							"    pm.response.to.have.status(500);\r",
+							"});\r",
+							"pm.test(\"Response time is less than 300ms, it is \" + pm.response.responseTime + \"ms!!!\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{Auth url}}/logout",
+					"host": [
+						"{{Auth url}}"
+					],
+					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
