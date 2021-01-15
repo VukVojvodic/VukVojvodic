@@ -1,0 +1,647 @@
+{
+	"info": {
+		"_postman_id": "f6341eaa-6710-460e-8c78-6d8573adfa16",
+		"name": "ReqRes",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "RR User list",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"var data = jsonData.data\r",
+							"var data1 = jsonData.data[0]\r",
+							"pm.test(\"Request is successful with a status code of 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"First member is \" + data1.first_name + \" \" + data1.last_name, function () {\r",
+							"  pm.expect(data1.first_name).to.equal(\"George\")\r",
+							"  pm.expect(data1.last_name).to.equal(\"Bluth\")\r",
+							"});\r",
+							"pm.test(\"Response has property 'total' that has value 12\", function () {\r",
+							"  pm.expect(jsonData).to.have.property(\"total\").to.eq(12)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}api/users?page=1",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"users"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RR Get single User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"var data = jsonData.data\r",
+							"pm.environment.set(\"url\",jsonData.support.url)\r",
+							"pm.test(\"Request is successful with a status code of 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Second member is \" + data.first_name + \" \" + data.last_name, function () {\r",
+							"  pm.expect(data.first_name).to.equal(\"Janet\")\r",
+							"  pm.expect(data.last_name).to.equal(\"Weaver\")\r",
+							"});\r",
+							"var url = pm.environment.get(\"url\")\r",
+							"pm.test(\"Response has property 'support' that has value url\", function () {\r",
+							"  pm.expect(jsonData.support).to.have.property(\"url\").to.eq(url)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}api/users/2 ",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"users",
+						"2 "
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RR User 404",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Request is unsuccessful with a status code of 404\", function () {\r",
+							"  pm.response.to.have.status(404);\r",
+							"});\r",
+							"pm.test(\"Response is null\", function () {\r",
+							"  pm.expect(jsonData[0]).to.be.undefined\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}api/users/23 ",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"users",
+						"23 "
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RR List",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"var data = jsonData.data\r",
+							"var data1 = data[0]\r",
+							"pm.test(\"Request is successful with a status code of 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"List has 6 items\", function () {\r",
+							"  pm.expect(data.length).to.eq(6)\r",
+							"});\r",
+							"var name = data1.name\r",
+							"var year = data1.year\r",
+							"pm.test(\"First item is \" + data1.name, function () {\r",
+							"  pm.expect(data1.name).to.equal(name)\r",
+							"  pm.expect(data1.year).to.equal(year)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}api/unknown",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"unknown"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RR Get single item",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"var data = jsonData.data\r",
+							"pm.environment.set(\"url\",jsonData.support.url)\r",
+							"pm.test(\"Request is successful with a status code of 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"var name = data.name\r",
+							"var year = data.year\r",
+							"pm.test(\"First item is \" + data.name, function () {\r",
+							"  pm.expect(data.name).to.equal(name)\r",
+							"  pm.expect(data.year).to.equal(year)\r",
+							"});\r",
+							"var url = pm.environment.get(\"url\")\r",
+							"pm.test(\"Response has property 'support' that has value url\", function () {\r",
+							"  pm.expect(jsonData.support).to.have.property(\"url\").to.eq(url)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}api/unknown/2 ",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"unknown",
+						"2 "
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RR Item 404",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Request is unsuccessful with a status code of 404\", function () {\r",
+							"  pm.response.to.have.status(404);\r",
+							"});\r",
+							"pm.test(\"Response is null\", function () {\r",
+							"  pm.expect(jsonData[0]).to.be.undefined\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}api/unknown/23",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"unknown",
+						"23"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Request is successful with a status code of 201\", function () {\r",
+							"  pm.response.to.have.status(201);\r",
+							"});\r",
+							"pm.test(\"Response is OK, added \" + jsonData.name, function () {\r",
+							"  pm.expect(jsonData.name).to.equal(\"morpheus\")\r",
+							"  pm.expect(jsonData.job).to.equal(\"leader\")\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"morpheus\",\r\n    \"job\": \"leader\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}api/users",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Edit User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Request is successful with a status code of 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Response is OK, edited \" + jsonData.name, function () {\r",
+							"  pm.expect(jsonData.name).to.equal(\"morpheus\")\r",
+							"  pm.expect(jsonData.job).to.equal(\"zion resident\")\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"morpheus\",\r\n    \"job\": \"zion resident\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}api/users/2",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"users",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Patch User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Request is successful with a status code of 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Response is OK, edited \" + jsonData.name, function () {\r",
+							"  pm.expect(jsonData.name).to.equal(\"morpheus\")\r",
+							"  pm.expect(jsonData.job).to.equal(\"zion resident\")\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"morpheus\",\r\n    \"job\": \"zion resident\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}api/users/2",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"users",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 204\", function () {\r",
+							"  pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}api/users/2",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"users",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Request is successful with a status code of 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Response has token\", function () {\r",
+							"  pm.expect(jsonData.token).to.not.be.null\r",
+							"  pm.expect(jsonData.token).to.eq(\"QpwL5tke4Pnpja7X4\")\r",
+							"});\r",
+							"pm.test(\"Response has id \" + jsonData.id, function () {\r",
+							"  pm.expect(jsonData.id).to.not.be.null\r",
+							"  pm.expect(jsonData.id).to.eq(4)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"eve.holt@reqres.in\",\r\n    \"password\": \"pistol\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}api/register",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register error - no password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Request is successful with a status code of 400\", function () {\r",
+							"  pm.response.to.have.status(400);\r",
+							"});\r",
+							"pm.test(\"Response has error message\", function () {\r",
+							"  pm.expect(jsonData.error).to.not.be.null\r",
+							"  pm.expect(jsonData.error).to.eq(\"Missing password\")\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"sydney@fife\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}api/register",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Request is successful with a status code of 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Response has token\", function () {\r",
+							"  pm.expect(jsonData.token).to.not.be.null\r",
+							"  pm.expect(jsonData.token).to.eq(\"QpwL5tke4Pnpja7X4\")\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"eve.holt@reqres.in\",\r\n    \"password\": \"cityslicka\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}api/login",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login error - no password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Request is successful with a status code of 400\", function () {\r",
+							"  pm.response.to.have.status(400);\r",
+							"});\r",
+							"pm.test(\"Response has error message\", function () {\r",
+							"  pm.expect(jsonData.error).to.not.be.null\r",
+							"  pm.expect(jsonData.error).to.eq(\"Missing password\")\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"peter@klaven\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}api/login",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RR User list delayed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"var data = jsonData.data\r",
+							"var data1 = jsonData.data[0]\r",
+							"pm.test(\"Request is successful with a status code of 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"First member is \" + data1.first_name + \" \" + data1.last_name, function () {\r",
+							"  pm.expect(data1.first_name).to.equal(\"George\")\r",
+							"  pm.expect(data1.last_name).to.equal(\"Bluth\")\r",
+							"});\r",
+							"pm.test(\"Response has property 'total' that has value 12\", function () {\r",
+							"  pm.expect(jsonData).to.have.property(\"total\").to.eq(12)\r",
+							"});\r",
+							"pm.test(\"Response time is more than 3000ms\", () => {\r",
+							"  pm.expect(pm.response.responseTime).to.be.above(3000);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}api/users?delay=3",
+					"host": [
+						"{{BaseUrl}}api"
+					],
+					"path": [
+						"users"
+					],
+					"query": [
+						{
+							"key": "delay",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
